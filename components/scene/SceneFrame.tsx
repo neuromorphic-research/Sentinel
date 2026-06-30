@@ -3,9 +3,22 @@ import { cn } from "@/lib/utils";
 
 type SceneKey = Camera["scene"];
 
+// Dummy night-CCTV stills served from /public/scenes. The SVG renderer below is
+// kept as a graceful fallback if an image is ever missing.
+const SCENE_IMAGE: Record<SceneKey, string> = {
+  "fence-night": "/scenes/scene-fence-night.png",
+  "yard-night": "/scenes/scene-yard-night.png",
+  "loading-dock": "/scenes/scene-loading-dock.png",
+  substation: "/scenes/scene-substation.png",
+  gate: "/scenes/scene-gate.png",
+  "equipment-yard": "/scenes/scene-equipment-yard.png",
+  perimeter: "/scenes/scene-perimeter.png",
+};
+
 /**
- * A stylized night/IR camera still rendered entirely in SVG — no real footage.
- * Each scene key paints a distinct, recognizable perimeter environment.
+ * A night/IR camera still. Renders a photographic placeholder frame with the
+ * detection-overlay language (scanlines, vignette, IR tint) layered on top.
+ * Falls back to a fully SVG-drawn scene if no image is mapped.
  */
 export function SceneFrame({
   scene,
@@ -16,36 +29,50 @@ export function SceneFrame({
   className?: string;
   children?: React.ReactNode;
 }) {
+  const img = SCENE_IMAGE[scene];
+
   return (
     <div className={cn("relative overflow-hidden frame-bg", className)}>
-      <svg
-        viewBox="0 0 320 180"
-        preserveAspectRatio="xMidYMid slice"
-        className="absolute inset-0 h-full w-full"
-        aria-hidden
-      >
-        <defs>
-          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#0e141b" />
-            <stop offset="1" stopColor="#080a0d" />
-          </linearGradient>
-          <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#0c0f13" />
-            <stop offset="1" stopColor="#05060800" />
-          </linearGradient>
-          <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0" stopColor="rgba(245,165,36,0.45)" />
-            <stop offset="1" stopColor="rgba(245,165,36,0)" />
-          </radialGradient>
-        </defs>
+      {img ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={img}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full select-none object-cover"
+          draggable={false}
+        />
+      ) : (
+        <svg
+          viewBox="0 0 320 180"
+          preserveAspectRatio="xMidYMid slice"
+          className="absolute inset-0 h-full w-full"
+          aria-hidden
+        >
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#0e141b" />
+              <stop offset="1" stopColor="#080a0d" />
+            </linearGradient>
+            <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#0c0f13" />
+              <stop offset="1" stopColor="#05060800" />
+            </linearGradient>
+            <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0" stopColor="rgba(245,165,36,0.45)" />
+              <stop offset="1" stopColor="rgba(245,165,36,0)" />
+            </radialGradient>
+          </defs>
 
-        <rect x="0" y="0" width="320" height="180" fill="url(#sky)" />
-        <SceneArt scene={scene} />
-        <rect x="0" y="96" width="320" height="84" fill="url(#ground)" />
-      </svg>
+          <rect x="0" y="0" width="320" height="180" fill="url(#sky)" />
+          <SceneArt scene={scene} />
+          <rect x="0" y="96" width="320" height="84" fill="url(#ground)" />
+        </svg>
+      )}
 
-      {/* scanlines + vignette */}
-      <div className="absolute inset-0 scanlines opacity-60" />
+      {/* IR tint + scanlines + vignette so it reads as a live security feed */}
+      <div className="pointer-events-none absolute inset-0 bg-[#0a1410] mix-blend-color opacity-30" />
+      <div className="pointer-events-none absolute inset-0 scanlines opacity-50" />
       <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_90px_rgba(0,0,0,0.7)]" />
 
       {children}
