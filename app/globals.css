@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+}
+
+* {
+  border-color: theme("colors.hairline");
+}
+
+html,
+body {
+  background-color: theme("colors.base");
+  color: theme("colors.ink");
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-feature-settings: "cv05", "ss01";
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.25);
+  color: #eef6f8;
+}
+
+/* Crisp, on-brand focus rings */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px theme("colors.base"), 0 0 0 3px theme("colors.accent");
+  border-radius: 6px;
+}
+
+/* Thin, structural scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: theme("colors.base");
+}
+::-webkit-scrollbar-thumb {
+  background: theme("colors.hairline-strong");
+  border-radius: 999px;
+  border: 2px solid theme("colors.base");
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a414d;
+}
+
+@layer components {
+  /* Elevated panel */
+  .panel {
+    @apply rounded-xl border border-hairline bg-panel;
+  }
+  .panel-2 {
+    @apply rounded-lg border border-hairline bg-panel-2;
+  }
+
+  /* Mono telemetry readout */
+  .mono {
+    @apply font-mono tabular-nums tracking-tight;
+  }
+
+  /* Hairline label (overline) */
+  .overline {
+    @apply font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint;
+  }
+
+  /* Grid backdrop for control-room feel */
+  .grid-bg {
+    background-image:
+      linear-gradient(theme("colors.hairline") 1px, transparent 1px),
+      linear-gradient(90deg, theme("colors.hairline") 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: -1px -1px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+  }
+
+  /* Faux video frame texture */
+  .frame-bg {
+    background:
+      radial-gradient(120% 120% at 50% 0%, rgba(255, 255, 255, 0.03), transparent 55%),
+      linear-gradient(180deg, #0d0f13 0%, #07080a 100%);
+  }
+
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.025) 0px,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
